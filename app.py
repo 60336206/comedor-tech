@@ -71,12 +71,14 @@ def validar():
     return render_template("validar.html", usuario=session.get("usuario"), rol=session.get("rol"))
 
 
+
+
 @app.route("/api/validar/<codigo>")
 @login_required
 def api_validar(codigo):
     ticket = TICKETS.get(codigo)
     if not ticket:
-        return jsonify({"ok": False, "mensaje": "Ticket no encontrado"}), 404
+        return jsonify({"ok": False, "mensaje": "Código no válido o ticket inexistente"}), 404
     return jsonify({"ok": True, "ticket": ticket})
 
 
