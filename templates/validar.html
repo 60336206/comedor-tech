@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>COMEDOR-TECH | Validar Entrada</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="topbar">
+        <span>COMEDOR-TECH</span>
+        <span>{{ usuario }} ({{ rol }}) | <a href="{{ url_for('logout') }}">Salir</a></span>
+    </div>
+
+    <div class="panel">
+        <h2>Escanee Código de Barras / QR del Ticket</h2>
+
+        <div class="scan-row">
+            <input type="text" id="codigoInput" placeholder="Código de estudiante" autofocus>
+            <button onclick="validarTicket()">Validar Entrada</button>
+        </div>
+
+        <table id="tablaResultado" style="display:none;">
+            <thead>
+                <tr>
+                    <th>Código Estudiante</th>
+                    <th>Nombres y Apellidos</th>
+                    <th>Turno Reservado</th>
+                    <th>Estado de Ticket</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td id="c-codigo"></td>
+                    <td id="c-nombres"></td>
+                    <td id="c-turno"></td>
+                    <td id="c-estado"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div id="mensajeAcceso" class="mensaje-exito" style="display:none;"></div>
+
+        <button id="btnAtender" style="display:none;" onclick="registrarAtendido()">
+            Registrar como Atendido / Servido
+        </button>
+    </div>
+
+    <script>
+        let codigoActual = null;
+
+        async function validarTicket() {
+            const codigo = document.getElementById('codigoInput').value.trim();
+            if (!codigo) return;
+
+            const res = await fetch(`/api/validar/${codigo}`);
+            const data = await res.json();
+
+            if (!data.ok) {
+                alert(data.mensaje);
+                return;
+            }
+
+            codigoActual = codigo;
+            const t = data.ticket;
+            document.getElementById('c-codigo').innerText = t.codigo_estudiante;
+            document.getElementById('c-nombres').innerText = `${t.nombres} ${t.apellidos}`;
+            document.getElementById('c-turno').innerText = t.turno;
+            document.getElementById('c-estado').innerText =
+                t.estado === 'VALIDO_SIN_SERVIR' ? 'VÁLIDO - SIN SERVIR' : 'ATENDIDO';
+
+            document.getElementById('tablaResultado').style.display = 'table';
+
+            const mensaje = document.getElementById('mensajeAcceso');
+            if (t.estado === 'VALIDO_SIN_SERVIR') {
+                mensaje.innerText = 'CONTROL DE ACCESO EXITOSO: Permita el ingreso del comensal y entregue la bandeja de alimentos.';
+                mensaje.style.display = 'block';
+                document.getElementById('btnAtender').style.display = 'inline-block';
+            } else {
+                mensaje.innerText = 'Este ticket ya fue atendido.';
+                mensaje.style.display = 'block';
+                document.getElementById('btnAtender').style.display = 'none';
+            }
+        }
+
+        async function registrarAtendido() {
+            if (!codigoActual) return;
+            const res = await fetch(`/api/atender/${codigoActual}`, { method: 'POST' });
+            const data = await res.json();
+            if (data.ok) {
+                validarTicket();
+            }
+        }
+    </script>
+</body>
+</html>
