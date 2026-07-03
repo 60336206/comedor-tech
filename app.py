@@ -11,6 +11,7 @@ app.secret_key = "comedor-tech-secret-2026"
 USUARIOS = {
     "admin": {"password": "admin123", "rol": "Administrador"},
     "colaborador": {"password": "colab123", "rol": "Colaborador"},
+    "superusuario": {"password": "super123", "rol": "Super Usuario"},
 }
 
 # Tickets de comedor (coinciden con el diseño de la imagen)
