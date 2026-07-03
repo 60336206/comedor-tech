@@ -3,7 +3,7 @@ from functools import wraps
 import os
 
 app = Flask(__name__)
-app.secret_key = "TEST_2026"
+app.secret_key = "TEST____2026"
 
 # ------------------------------------------------------------------
 # "Base de datos" en memoria (rama TEST inicializa estos usuarios)
