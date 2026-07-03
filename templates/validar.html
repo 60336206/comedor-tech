@@ -50,7 +50,10 @@
 
         async function validarTicket() {
             const codigo = document.getElementById('codigoInput').value.trim();
-            if (!codigo) return;
+            if (!codigo) {
+                alert('Ingrese o escanee un código de estudiante');
+                return;
+            }
 
             const res = await fetch(`/api/validar/${codigo}`);
             const data = await res.json();
